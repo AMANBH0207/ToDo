@@ -1,2 +1,21 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+
+/* Scrollbar styles */
+.custom-scrollbar {
+  scrollbar-width: thin;               /* Firefox */
+  scrollbar-color: #3f404077 transparent; /* Firefox */
+
+  /* For WebKit (Chrome, Safari, Edge) */
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3f404077;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}

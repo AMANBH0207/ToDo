@@ -24,17 +24,19 @@ export default function TodoList({
   onEdit,
 }: Props) {
   return (
-    <div className="space-y-4">
-      {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onToggleComplete={onToggleComplete}
-          onToggleImportant={onToggleImportant}
-          onToggleArchive={onToggleArchive}
-          onEdit={onEdit}
-        />
-      ))}
-    </div>
+   <div
+  className="space-y-4 h-[64vh] overflow-y-scroll md:h-[75vh] md:overflow-y-scroll custom-scrollbar"
+>
+  {todos.map((todo) => (
+    <TodoItem
+      key={todo.id}
+      todo={todo}
+      onToggleComplete={onToggleComplete}
+      onToggleImportant={onToggleImportant}
+      onToggleArchive={onToggleArchive}
+      onEdit={onEdit}
+    />
+  ))}
+</div>
   );
 }

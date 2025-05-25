@@ -24,7 +24,7 @@ export default function TodoItem({ todo, onToggleComplete, onToggleImportant, on
   <div className="flex items-center gap-3 flex-1 min-w-0">
     <Checkbox checked={todo.completed} onCheckedChange={() => onToggleComplete(todo.id)} />
     <span
-      className={`text-lg ${todo.completed ? "line-through text-gray-500" : ""} truncate`}
+      className={`text-lg ${todo.completed ? "line-through text-gray-500" : ""} `}
       title={todo.text} // Optional: show full text on hover
     >
       {todo.text}

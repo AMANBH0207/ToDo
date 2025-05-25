@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList";
-import Toaster from "./ui/Toaster"; // import Toaster component
+import Toaster from "./ui/Toaster";
 
 interface Todo {
   id: number;
@@ -23,8 +23,8 @@ export default function TodoApp() {
   const [text, setText] = useState("");
   const [editId, setEditId] = useState<number | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [showCompleted, setShowCompleted] = useState(false);
 
-  // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem(THEME_STORAGE_KEY) === "dark";
@@ -32,22 +32,19 @@ export default function TodoApp() {
     return false;
   });
 
-  // Toaster state
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
-  // Show toaster helper
   const showToaster = (message: string) => {
     setToastMessage(message);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000); // hide after 3 seconds
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(todos));
   }, [todos]);
 
-  // Sync dark mode with <html data-theme>
   useEffect(() => {
     const html = document.documentElement;
     if (isDarkMode) {
@@ -88,18 +85,29 @@ export default function TodoApp() {
   };
 
   const toggleComplete = (id: number) => {
-    setTodos(
-      todos.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-    showToaster("Task completion toggled");
-  };
+  const updatedTodos = todos.map((t) => {
+    if (t.id === id) {
+      const newCompleted = !t.completed;
+      showToaster(newCompleted ? "Task marked as completed" : "Task marked as incomplete");
+      return { ...t, completed: newCompleted };
+    }
+    return t;
+  });
 
-  const toggleImportant = (id: number) => {
-    setTodos(
-      todos.map((t) => (t.id === id ? { ...t, important: !t.important } : t))
-    );
-    showToaster("Task importance toggled");
-  };
+  setTodos(updatedTodos);
+};
+
+ const toggleImportant = (id: number) => {
+  const updatedTodos = todos.map((t) => {
+    if (t.id === id) {
+      const newImportant = !t.important;
+      showToaster(newImportant ? `"${t.text}" marked as important` : `"${t.text}" unmarked as important`);
+      return { ...t, important: newImportant };
+    }
+    return t;
+  });
+  setTodos(updatedTodos);
+};
 
   const toggleArchive = (id: number) => {
     setTodos(
@@ -114,7 +122,14 @@ export default function TodoApp() {
     );
   };
 
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter((t) => t.id !== id));
+    showToaster("Task deleted");
+  };
+
   const archivedTodos = todos.filter(todo => todo.archived);
+  const completedTodos = todos.filter(todo => todo.completed && !todo.archived);
+  const activeTodos = todos.filter(todo => !todo.archived && !todo.completed);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 p-6 relative dark:bg-gray-900 dark:from-gray-800 dark:to-gray-900 transition-colors duration-500">
@@ -140,7 +155,7 @@ export default function TodoApp() {
           isEditing={editId !== null}
         />
         <TodoList
-          todos={todos.filter(todo => !todo.archived)}
+          todos={activeTodos}
           onToggleComplete={toggleComplete}
           onToggleImportant={toggleImportant}
           onToggleArchive={toggleArchive}
@@ -148,17 +163,26 @@ export default function TodoApp() {
         />
       </div>
 
-      {/* Floating Archive Count Button */}
-      <button
-        onClick={() => setShowArchived(!showArchived)}
-        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
-        title="Show Archived Tasks"
-        aria-label="Show Archived Tasks"
-      >
-        {archivedTodos.length}
-      </button>
+<div className="fixed bottom-6 right-6 flex gap-4">
+  <button
+    onClick={() => setShowCompleted(!showCompleted)}
+    className="bg-green-600 hover:bg-green-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
+    title="Show Completed Tasks"
+    aria-label="Show Completed Tasks"
+  >
+    {completedTodos.length}
+  </button>
 
-      {/* Archive Tasks Panel */}
+  <button
+    onClick={() => setShowArchived(!showArchived)}
+    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"
+    title="Show Archived Tasks"
+    aria-label="Show Archived Tasks"
+  >
+    {archivedTodos.length}
+  </button>
+</div>
+
       {showArchived && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-auto p-6 relative">
@@ -195,7 +219,51 @@ export default function TodoApp() {
         </div>
       )}
 
-      {/* Toaster Notification */}
+      {showCompleted && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-auto p-6 relative">
+            <h2 className="text-xl font-semibold mb-4 text-center text-gray-900 dark:text-gray-100">Completed Tasks</h2>
+            {completedTodos.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">No completed tasks</p>
+            ) : (
+              <ul className="space-y-3">
+                {completedTodos.map(todo => (
+                  <li
+                    key={todo.id}
+                    className="border rounded p-3 flex justify-between items-center border-gray-300 dark:border-gray-700"
+                  >
+                    <span className="line-through text-gray-400 dark:text-gray-500">{todo.text}</span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => toggleComplete(todo.id)}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-600 font-semibold"
+                        title="Mark Incomplete"
+                      >
+                        Undo
+                      </button>
+                      <button
+                        onClick={() => deleteTodo(todo.id)}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-600 font-semibold"
+                        title="Delete Forever"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              onClick={() => setShowCompleted(false)}
+              className="absolute top-3 right-3 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-bold text-lg"
+              aria-label="Close Completed Tasks"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+
       <Toaster message={toastMessage} show={showToast} />
     </div>
   );
