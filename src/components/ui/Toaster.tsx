@@ -1,6 +1,3 @@
-// Toaster.tsx
-import React from "react";
-
 interface ToasterProps {
   message: string;
   show: boolean;
