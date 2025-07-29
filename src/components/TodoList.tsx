@@ -25,7 +25,7 @@ export default function TodoList({
 }: Props) {
   return (
    <div
-  className="space-y-4 h-[64vh] overflow-y-scroll md:h-[75vh] md:overflow-y-scroll custom-scrollbar"
+  className="space-y-4 h-[64vh] overflow-y-scroll md:h-[75vh] md:overflow-y-auto custom-scrollbar"
 >
   {todos.map((todo) => (
     <TodoItem

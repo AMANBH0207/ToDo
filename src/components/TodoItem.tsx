@@ -31,13 +31,13 @@ export default function TodoItem({ todo, onToggleComplete, onToggleImportant, on
     </span>
   </div>
   <div className="flex items-center gap-1 md:gap-3 ml-4 flex-shrink-0">
-    <Button variant="ghost" size="icon" onClick={() => onToggleImportant(todo.id)}>
+    <Button variant="outline" onClick={() => onToggleImportant(todo.id)}>
       <Star className={todo.important ? "text-yellow-400 fill-yellow-400" : "text-gray-400"} />
     </Button>
-    <Button variant="ghost" size="icon" onClick={() => onToggleArchive(todo.id)}>
+    <Button variant="outline" onClick={() => onToggleArchive(todo.id)}>
       <Archive className={todo.archived ? "text-purple-500" : "text-gray-400"} />
     </Button>
-    <Button variant="ghost" size="icon" onClick={() => onEdit(todo.id)}>
+    <Button variant="outline" onClick={() => onEdit(todo.id)}>
       <Edit2 className="text-blue-500" />
     </Button>
   </div>
